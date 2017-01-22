@@ -145,9 +145,9 @@ def train_model():
     print(X_validation.shape)
 
     model = Sequential()
-    model.add(Conv2D(40, 3,3, input_shape=(40,80,3), activation='relu'))
+    model.add(Conv2D(64, 3,3, input_shape=(40,80,3), activation='relu'))
     model.add(Flatten())
-    model.add(Dense(1280, activation='relu'))
+    model.add(Dense(640, activation='relu'))
     model.add(Dense(360,activation='softmax'))
 
     model.summary()
@@ -161,7 +161,7 @@ def train_model():
 
 #X_train, X_validation, y_train, y_validation = load_train_test()
 train_model()
-
+#val_acc: 0.5790
 
 
 
