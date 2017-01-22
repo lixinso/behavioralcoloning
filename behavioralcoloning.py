@@ -96,39 +96,48 @@ def read_imgs(file_wheel_map):
     print("type(new_images[0])", type(new_images[0]))
     print("type(new_wheels)[0]", type(new_wheels[0]))
 
-    train = {"features": np.array(new_images), "labels": new_wheels}
+    new_images_train, new_images_test, new_wheels_train, new_wheels_test = train_test_split(np.array(new_images), new_wheels, test_size=0.20, random_state=42)
 
+    train = {"features": new_images_train, "labels": new_wheels_train}
     pickle.dump(train,open("./train.p","wb"))
 
-def load_train_test():
+    test = {"features": new_images_test, "labels": new_wheels_test}
+    pickle.dump(test,open("./test.p","wb"))
+
+
+
+def load_train_vali_test():
     with open("./train.p","rb") as trainfile:
         train = pickle.load(trainfile)
     features_all = train["features"]
     labels_all = train["labels"]
-
-
-
     X_train1, X_validation1, y_train1, y_validation1 = train_test_split(features_all, labels_all, test_size=0.20, random_state=42)
-
-
-
     X_train1 = X_train1.astype('float32')
     X_validation1 = X_validation1.astype('float32')
-
     X_train1 = X_train1 / 255 - 0.5
     X_validation1 = X_validation1 / 255 - 0.5
 
-    print(X_train1[0], y_train1[0])
-    print(len(X_train1), len(X_validation1), len(y_train1), len(y_validation1))
 
-    return X_train1, X_validation1, y_train1, y_validation1
 
+    with open("./test.p","rb") as testfile:
+        test = pickle.load(testfile)
+
+    X_test1 = test["features"]
+    y_test1 = test["labels"]
+    X_test1 = X_test1.astype('float32')
+    X_test1 = X_test1 / 255 - 0.5
+
+    print(X_train1[0], y_train1[0], X_validation1[0], y_validation1[0], X_test1[0], y_test1[0])
+    print(len(X_train1), len(X_validation1),len(X_test1), len(y_train1), len(y_validation1), len(y_test1))
+
+    return X_train1, X_validation1, X_test1, y_train1, y_validation1, y_test1
 
 def train_model():
-    X_train, X_validation, y_train, y_validation = load_train_test()
+    X_train, X_validation,X_test, y_train, y_validation, y_test = load_train_vali_test()
 
     Y_train = np_utils.to_categorical(y_train, 360)
     Y_validation = np_utils.to_categorical(y_validation, 360)
+    Y_test = np_utils.to_categorical(y_test, 360)
 
     #X_train_flat = X_train.reshape(-1, 160*320*3)
     #X_validation_flat = X_validation.reshape(-1,160,320*30)
@@ -156,7 +165,11 @@ def train_model():
     model.summary()
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    history = model.fit(X_train, Y_train, batch_size=100, nb_epoch=30, verbose=1, validation_data=(X_validation,Y_validation))
+    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=100, verbose=1, validation_data=(X_validation,Y_validation))
+
+    history2=model.evaluate(X_test, Y_test)
+    print(history2)
+
 
 #Preproess
 #file_wheel = read_labels()
