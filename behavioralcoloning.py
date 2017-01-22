@@ -147,6 +147,7 @@ def train_model():
     model = Sequential()
     model.add(Conv2D(64, 3,3, input_shape=(40,80,3), activation='relu'))
     model.add(MaxPooling2D((2, 2)))
+    model.add((Dropout(0.5)))
     model.add(Activation('relu'))
     model.add(Flatten())
     model.add(Dense(640, activation='relu'))
