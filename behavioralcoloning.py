@@ -163,7 +163,7 @@ def train_model():
 
 #X_train, X_validation, y_train, y_validation = load_train_test()
 train_model()
-#val_acc: 0.5790
+#val_acc: 1.0
 
 
 
