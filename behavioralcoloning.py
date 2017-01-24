@@ -165,10 +165,12 @@ def train_model():
     model.summary()
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=100, verbose=1, validation_data=(X_validation,Y_validation))
+    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=30, verbose=1, validation_data=(X_validation,Y_validation))
 
     history2=model.evaluate(X_test, Y_test)
     print(history2)
+
+    model.save("./model_save.h5",True)
 
 
 #Preproess
