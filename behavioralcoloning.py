@@ -20,6 +20,9 @@ def read_labels():
 
     label_dir = "../data/driving_log.csv"
 
+    new_label_file = "../data/new_driving_log.csv"
+    new_label_text = ""
+
     cnt = 0
     with open(label_dir) as lf:
         for line in lf:
@@ -34,12 +37,16 @@ def read_labels():
                 center_file = columns[0].strip()[4:]
                 left_file = columns[1].strip()[4:]
                 right_file = columns[2].strip()[4:]
-                print(columns[3])
-                steering = int(float(columns[3].strip()) * 180.0 )
+                #print(columns[3])
+                steering = int( round( float(columns[3].strip()) * 5.0 ) )
 
                 print(center_file, steering)
+                new_label_text += center_file + "," + str(steering) + "\n"
 
                 file_wheel_map[center_file] = steering
+
+    with open(new_label_file,"w") as nf:
+        nf.write(new_label_text)
 
     return file_wheel_map
 
@@ -47,7 +54,7 @@ def read_labels():
 def read_imgs(file_wheel_map):
 
 
-    img_dir = "../data/IMG_resized/"
+    img_dir = "../data/IMG_resized_nvidia/"
     img_prefix_center = "center"
     img_prefix_left = "left"
     img_prefix_right = "right"
@@ -135,9 +142,9 @@ def load_train_vali_test():
 def train_model():
     X_train, X_validation,X_test, y_train, y_validation, y_test = load_train_vali_test()
 
-    Y_train = np_utils.to_categorical(y_train, 360)
-    Y_validation = np_utils.to_categorical(y_validation, 360)
-    Y_test = np_utils.to_categorical(y_test, 360)
+    Y_train = np_utils.to_categorical(y_train, 11)
+    Y_validation = np_utils.to_categorical(y_validation, 11)
+    Y_test = np_utils.to_categorical(y_test, 11)
 
     #X_train_flat = X_train.reshape(-1, 160*320*3)
     #X_validation_flat = X_validation.reshape(-1,160,320*30)
@@ -145,7 +152,7 @@ def train_model():
     batch_size = 128
     nb_classes = 360
     nb_epoch = 12
-    img_rows, img_cols = 40, 80
+    img_rows, img_cols = 66, 200
 
     pool_size = (2,2)
     kernel_size = (3,3)
@@ -154,13 +161,13 @@ def train_model():
     print(X_validation.shape)
 
     model = Sequential()
-    model.add(Conv2D(64, 3,3, input_shape=(40,80,3), activation='relu'))
+    model.add(Conv2D(64, 3,3, input_shape=(66,200,3), activation='relu'))
     model.add(MaxPooling2D((2, 2)))
     model.add((Dropout(0.5)))
     model.add(Activation('relu'))
     model.add(Flatten())
     model.add(Dense(640, activation='relu'))
-    model.add(Dense(360,activation='softmax'))
+    model.add(Dense(11,activation='softmax'))
 
     model.summary()
 
