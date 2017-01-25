@@ -161,18 +161,36 @@ def train_model():
     print(X_validation.shape)
 
     model = Sequential()
-    model.add(Conv2D(64, 3,3, input_shape=(66,200,3), activation='relu'))
+    model.add(Conv2D(24, 5,5, input_shape=(66,200,3), activation='relu'))
     model.add(MaxPooling2D((2, 2)))
     model.add((Dropout(0.5)))
     model.add(Activation('relu'))
+    model.add(Conv2D(36, 5,5, activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+    model.add((Dropout(0.5)))
+    model.add(Activation('relu'))
+    #model.add(Conv2D(48, 5,5, activation='relu'))
+    model.add(Conv2D(48, 3, 3, activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+    model.add((Dropout(0.5)))
+    model.add(Activation('relu'))
+
+    model.add(Conv2D(64, 3,3, activation='relu'))
+    model.add(Activation('relu'))
+    model.add(Conv2D(64, 3,3, activation='relu'))
+    model.add(Activation('relu'))
+
+
     model.add(Flatten())
-    model.add(Dense(640, activation='relu'))
+    #model.add(Dense(1164, activation='relu'))
+    model.add(Dense(110,activation='softmax'))
+    model.add(Dense(55,activation='softmax'))
     model.add(Dense(11,activation='softmax'))
 
     model.summary()
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=30, verbose=1, validation_data=(X_validation,Y_validation))
+    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
 
     history2=model.evaluate(X_test, Y_test)
     print(history2)
