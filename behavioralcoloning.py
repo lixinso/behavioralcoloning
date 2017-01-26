@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 import os
 
 from keras.models import Sequential
+from keras.models import model_from_json
 from keras.layers import  Dense, Dropout, Activation, Flatten, Convolution2D, MaxPooling2D, Conv2D
 from keras.utils import np_utils
+from keras.optimizers import Adam
 from keras import backend as K
 
 np.random.seed(1337)
@@ -189,13 +191,18 @@ def train_model():
 
     model.summary()
 
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
+    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=2, verbose=1, validation_data=(X_validation,Y_validation))
 
     history2=model.evaluate(X_test, Y_test)
     print(history2)
 
-    model.save("./model_save.h5",True)
+    model_j = model.to_json()
+    with open("./model.json","w") as jf:
+        jf.write(model_j)
+    #model.save("./model_save.model",True)
+
+    model.save_weights("./model.h5",True)
 
 
 #Preproess
