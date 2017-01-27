@@ -18,7 +18,7 @@ import utils
 
 from keras.models import model_from_json
 
-image_arr = utils.read_images(["/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/data/IMG_resized_nvidia/center_2016_12_01_13_43_17_948.jpg"])
+image_arr = utils.read_images(["/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/data/IMG/center_2016_12_01_13_43_17_948.jpg"])
 
 with open("./model.json","r") as jf:
     model_json = jf.read()
