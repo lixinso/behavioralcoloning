@@ -40,7 +40,7 @@ def read_labels():
                 left_file = columns[1].strip()[4:]
                 right_file = columns[2].strip()[4:]
                 #print(columns[3])
-                steering = int( round( float(columns[3].strip()) * 5.0 ) )
+                steering = float(columns[3].strip()) #int( round( float(columns[3].strip()) * 5.0 ) )
 
                 print(center_file, steering)
                 new_label_text += center_file + "," + str(steering) + "\n"
@@ -144,9 +144,13 @@ def load_train_vali_test():
 def train_model():
     X_train, X_validation,X_test, y_train, y_validation, y_test = load_train_vali_test()
 
-    Y_train = np_utils.to_categorical(y_train, 11)
-    Y_validation = np_utils.to_categorical(y_validation, 11)
-    Y_test = np_utils.to_categorical(y_test, 11)
+    #Y_train = np_utils.to_categorical(y_train, 11)
+    #Y_validation = np_utils.to_categorical(y_validation, 11)
+    #Y_test = np_utils.to_categorical(y_test, 11)
+
+    Y_train = y_train
+    Y_validation = y_validation
+    Y_test = y_test
 
     #X_train_flat = X_train.reshape(-1, 160*320*3)
     #X_validation_flat = X_validation.reshape(-1,160,320*30)
@@ -188,10 +192,11 @@ def train_model():
     model.add(Dense(110,activation='softmax'))
     model.add(Dense(55,activation='softmax'))
     model.add(Dense(11,activation='softmax'))
+    model.add(Dense(1,name='output', activation='tanh'))
 
     model.summary()
 
-    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
+    model.compile(loss='mse', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
     history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=2, verbose=1, validation_data=(X_validation,Y_validation))
 
     history2=model.evaluate(X_test, Y_test)
