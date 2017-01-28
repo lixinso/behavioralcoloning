@@ -15,6 +15,8 @@ from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras import backend as K
 
+import utils
+
 np.random.seed(1337)
 
 def read_labels():
@@ -56,7 +58,7 @@ def read_labels():
 def read_imgs(file_wheel_map):
 
 
-    img_dir = "../data/IMG_resized_nvidia/"
+    img_dir = "../data/IMG/"
     img_prefix_center = "center"
     img_prefix_left = "left"
     img_prefix_right = "right"
@@ -75,7 +77,8 @@ def read_imgs(file_wheel_map):
         if file.startswith("center"):
             cnt += 1
             print(str(cnt) + "/" + str(total_files_13) + "   " + file)
-            img = mpimg.imread(img_dir + file)
+            #img = mpimg.imread(img_dir + file)
+            img = utils.read_image(img_dir + file)
             #np.append(new_images,img, axis=0)
             new_images.append(img)
             #new_images.add
@@ -211,8 +214,8 @@ def train_model():
 
 
 #Preproess
-#file_wheel = read_labels()
-#read_imgs(file_wheel)
+file_wheel = read_labels()
+read_imgs(file_wheel)
 
 #X_train, X_validation, y_train, y_validation = load_train_test()
 train_model()

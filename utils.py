@@ -10,7 +10,7 @@ import numpy as np
 def preprocess(img):
     img = img.resize((200, 66))
     img1 = mpimg.pil_to_array(img)
-    print(type(img1))
+    #print(type(img1))
 
     img1 = img1.astype('float32')
     img1 = img1 / 255 - 0.5
