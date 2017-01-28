@@ -19,12 +19,14 @@ import utils
 
 np.random.seed(1337)
 
+data_dir = "../data/"
+
 def read_labels():
     file_wheel_map = {}
 
-    label_dir = "../data/driving_log.csv"
+    label_dir = data_dir + "driving_log.csv"
 
-    new_label_file = "../data/new_driving_log.csv"
+    new_label_file = data_dir + "new_driving_log.csv"
     new_label_text = ""
 
     cnt = 0
@@ -58,7 +60,7 @@ def read_labels():
 def read_imgs(file_wheel_map):
 
 
-    img_dir = "../data/IMG/"
+    img_dir = data_dir + "IMG/"
     img_prefix_center = "center"
     img_prefix_left = "left"
     img_prefix_right = "right"
@@ -75,26 +77,29 @@ def read_imgs(file_wheel_map):
     cnt = 0
     for file in files:
         if file.startswith("center"):
-            cnt += 1
-            print(str(cnt) + "/" + str(total_files_13) + "   " + file)
-            #img = mpimg.imread(img_dir + file)
-            img = utils.read_image(img_dir + file)
-            #np.append(new_images,img, axis=0)
-            new_images.append(img)
-            #new_images.add
 
-            wheel = file_wheel_map[file]
-            #new_wheels.append(wheel)
-            new_wheels.append(wheel)
+            if file in file_wheel_map:
 
-            #if cnt > 1000:
-            #    break
+                cnt += 1
+                print(str(cnt) + "/" + str(total_files_13) + "   " + file)
+                #img = mpimg.imread(img_dir + file)
+                img = utils.read_image(img_dir + file)
+                #np.append(new_images,img, axis=0)
+                new_images.append(img)
+                #new_images.add
 
-            #print(type(img))
-            print("image shape", img.shape)
-            #print()
-            #plt.imshow(img)
-            #plt.show()
+                wheel = file_wheel_map[file]
+                #new_wheels.append(wheel)
+                new_wheels.append(wheel)
+
+                #if cnt > 1000:
+                #    break
+
+                #print(type(img))
+                print("image shape", img.shape)
+                #print()
+                #plt.imshow(img)
+                #plt.show()
 
     new_images = np.array(new_images)
     new_wheels = np.array(new_wheels)
