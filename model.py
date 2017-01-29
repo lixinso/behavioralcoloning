@@ -19,7 +19,7 @@ import utils
 
 np.random.seed(1337)
 
-data_dir = "../data/"
+data_dir = "../session_data/"
 
 def read_labels():
     file_wheel_map = {}
@@ -40,9 +40,9 @@ def read_labels():
 
             columns = line.strip().split(",")
             if len(columns) > 4:
-                center_file = columns[0].strip()[4:]
-                left_file = columns[1].strip()[4:]
-                right_file = columns[2].strip()[4:]
+                center_file = columns[0].strip()#[4:]
+                left_file = columns[1].strip()#[4:]
+                right_file = columns[2].strip()#[4:]
                 #print(columns[3])
                 steering = float(columns[3].strip()) #int( round( float(columns[3].strip()) * 5.0 ) )
 
@@ -149,16 +149,167 @@ def load_train_vali_test():
 
     return X_train1, X_validation1, X_test1, y_train1, y_validation1, y_test1
 
+def split_train_test_validate_file_names():
+    file_wheel = read_labels()
+    files = list(file_wheel.keys())
+    print(type(files))
+    print(len(files))
+
+    files_train, files_vali_test = train_test_split(files, test_size=0.07, random_state=42)
+    files_vali, files_test = train_test_split(files_vali_test, test_size=0.5, random_state=42)
+
+    print("train: ", len(files_train))
+    print("vali: ", len(files_vali))
+    print("test: ", len(files_test))
+
+    return files_train, files_vali, files_test
+
+def generate_train_test(files, file_wheel):
+
+    img_dir = data_dir + "IMG/"
+    img_prefix_center = "center"
+    img_prefix_left = "left"
+    img_prefix_right = "right"
+
+    new_images = []
+    new_wheels = []
+
+    for file in files:
+        file_path = data_dir + file
+
+        if os.path.exists(file_path)  and (file in file_wheel):
+            img = utils.read_image(file_path)
+            wheel = file_wheel[file]
+
+            new_images.append(img)
+            new_wheels.append(wheel)
+
+    new_images = np.array(new_images)
+    new_wheels = np.array(new_wheels)
+
+    print(len(new_images))
+    print(len(new_wheels))
+    print("type(new_images)", type(new_images))
+    print("type(new_wheels)", type(new_wheels))
+    print("type(new_images[0])", type(new_images[0]))
+    print("type(new_wheels)[0]", type(new_wheels[0]))
+
+    return new_images, new_wheels
+
+    #---------
+    '''
+    files = os.listdir(img_dir)
+
+    total_files = len(files)
+    total_files_13 = total_files / 3
+
+
+
+
+    cnt = 0
+    for file in files:
+        if file.startswith("center"):
+
+            if file in file_wheel_map:
+
+                cnt += 1
+                print(str(cnt) + "/" + str(total_files_13) + "   " + file)
+                #img = mpimg.imread(img_dir + file)
+                img = utils.read_image(img_dir + file)
+                #np.append(new_images,img, axis=0)
+                new_images.append(img)
+                #new_images.add
+
+                wheel = file_wheel_map[file]
+                #new_wheels.append(wheel)
+                new_wheels.append(wheel)
+
+                #if cnt > 1000:
+                #    break
+
+                #print(type(img))
+                print("image shape", img.shape)
+                #print()
+                #plt.imshow(img)
+                #plt.show()
+
+    new_images = np.array(new_images)
+    new_wheels = np.array(new_wheels)
+
+    #new_images = new_images.reshape(-1, 32*32*3)
+
+    print(len(new_images))
+    print(len(new_wheels))
+    print("type(new_images)", type(new_images))
+    print("type(new_wheels)", type(new_wheels))
+    print("type(new_images[0])", type(new_images[0]))
+    print("type(new_wheels)[0]", type(new_wheels[0]))
+
+    new_images_train, new_images_test, new_wheels_train, new_wheels_test = train_test_split(np.array(new_images), new_wheels, test_size=0.20, random_state=42)
+
+    train = {"features": new_images_train, "labels": new_wheels_train}
+    pickle.dump(train,open("./train.p","wb"))
+
+    test = {"features": new_images_test, "labels": new_wheels_test}
+    pickle.dump(test,open("./test.p","wb"))
+    '''
+
+def generate_train(files, file_wheel):
+
+    batch_size = 1280
+    total_cnt = len(files)
+    batch_num = int(total_cnt / batch_size)
+
+    for b1 in range(0, batch_num):
+
+        print("Batch ", b1, " of ", batch_num)
+
+        new_images = []
+        new_wheels = []
+
+        for b2 in range(0, batch_size):
+            idx = b1 * batch_size + b2
+
+            file = files[idx]
+            file_path = data_dir + file
+
+            if os.path.exists(file_path)  and (file in file_wheel):
+                img = utils.read_image(file_path)
+                wheel = file_wheel[file]
+
+                new_images.append(img)
+                new_wheels.append(wheel)
+
+        new_images = np.array(new_images)
+        new_wheels = np.array(new_wheels)
+
+        print(len(new_images))
+        print(len(new_wheels))
+        print("type(new_images)", type(new_images))
+        print("type(new_wheels)", type(new_wheels))
+        print("type(new_images[0])", type(new_images[0]))
+        print("type(new_wheels)[0]", type(new_wheels[0]))
+
+        yield new_images, new_wheels
+
+
 def train_model():
-    X_train, X_validation,X_test, y_train, y_validation, y_test = load_train_vali_test()
+    files_train, files_vali, files_test = split_train_test_validate_file_names()
+
+    file_wheel = read_labels()
+    X_validation, Y_validation = generate_train_test(files_vali,file_wheel)
+    X_test, Y_test = generate_train_test(files_test, file_wheel)
+
+
+    #X_train, X_validation,X_test, y_train, y_validation, y_test = load_train_vali_test()
 
     #Y_train = np_utils.to_categorical(y_train, 11)
     #Y_validation = np_utils.to_categorical(y_validation, 11)
     #Y_test = np_utils.to_categorical(y_test, 11)
 
-    Y_train = y_train
-    Y_validation = y_validation
-    Y_test = y_test
+    #Y_train = y_train
+    #Y_validation = y_validation
+    #Y_test = y_test
 
     #X_train_flat = X_train.reshape(-1, 160*320*3)
     #X_validation_flat = X_validation.reshape(-1,160,320*30)
@@ -171,8 +322,8 @@ def train_model():
     pool_size = (2,2)
     kernel_size = (3,3)
 
-    print(X_train.shape)
-    print(X_validation.shape)
+    #print(X_train.shape)
+    #print(X_validation.shape)
 
     model = Sequential()
     model.add(Conv2D(24, 5,5, input_shape=(66,200,3), activation='relu'))
@@ -205,7 +356,9 @@ def train_model():
     model.summary()
 
     model.compile(loss='mse', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
-    history = model.fit(X_train, Y_train, batch_size=50, nb_epoch=2, verbose=1, validation_data=(X_validation,Y_validation))
+
+    for X_train, Y_train in generate_train(files_train, file_wheel):
+        history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
 
     history2=model.evaluate(X_test, Y_test)
     print(history2)
@@ -219,12 +372,15 @@ def train_model():
 
 
 #Preproess
-file_wheel = read_labels()
-read_imgs(file_wheel)
+#file_wheel = read_labels()
+#read_imgs(file_wheel)
 
 #X_train, X_validation, y_train, y_validation = load_train_test()
 train_model()
 #val_acc: 1.0
+
+
+#split_train_test_validate_file_names()
 
 
 

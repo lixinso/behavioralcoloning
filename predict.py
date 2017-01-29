@@ -18,20 +18,34 @@ import utils
 
 from keras.models import model_from_json
 
-#image_arr = utils.read_images(["/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/data/IMG/center_2016_12_01_13_43_17_948.jpg"])
-#image_arr = utils.read_images(["/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/data/IMG/center_2016_12_01_13_45_27_897.jpg"])
-image_arr = utils.read_images(["/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/data/IMG/center_2016_12_01_13_33_26_862.jpg"])
+data_dir = "/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/session_data/"
 
-with open("./model.json","r") as jf:
+with open("./model.json", "r") as jf:
     model_json = jf.read()
 
 loaded_model = model_from_json(model_json)
 loaded_model.load_weights("./model.h5")
 
-print(image_arr.shape)
 
-predicted = loaded_model.predict(image_arr,1,1)
 
-print(predicted)
+file_wheel = utils.read_labels()
 
+ii = 0
+for file in file_wheel:
+    ii+=1
+    if ii % 1000 != 0:
+        continue
+
+    #image_arr = utils.read_images([data_dir + "IMG/center_2017_01_21_00_16_39_587.jpg",
+    #                               data_dir + "IMG/center_2017_01_21_00_46_27_853.jpg",
+    #                               data_dir + "IMG/right_2017_01_21_00_32_49_032.jpg"])
+
+
+
+    image_arr = utils.read_images([data_dir + file])
+    #print(image_arr.shape)
+
+    predicted = loaded_model.predict(image_arr,1,1)
+
+    print("predicted      ", predicted)
 
