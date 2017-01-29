@@ -256,41 +256,43 @@ def generate_train_test(files, file_wheel):
 
 def generate_train(files, file_wheel):
 
-    batch_size = 1280
+    batch_size = 128
     total_cnt = len(files)
     batch_num = int(total_cnt / batch_size)
 
-    for b1 in range(0, batch_num):
+    while 1:
+        np.random.shuffle(files)
+        for b1 in range(0, batch_num):
 
-        print("Batch ", b1, " of ", batch_num)
+            print("Batch ", b1, " of ", batch_num)
 
-        new_images = []
-        new_wheels = []
+            new_images = []
+            new_wheels = []
 
-        for b2 in range(0, batch_size):
-            idx = b1 * batch_size + b2
+            for b2 in range(0, batch_size):
+                idx = b1 * batch_size + b2
 
-            file = files[idx]
-            file_path = data_dir + file
+                file = files[idx]
+                file_path = data_dir + file
 
-            if os.path.exists(file_path)  and (file in file_wheel):
-                img = utils.read_image(file_path)
-                wheel = file_wheel[file]
+                if os.path.exists(file_path)  and (file in file_wheel):
+                    img = utils.read_image(file_path)
+                    wheel = file_wheel[file]
 
-                new_images.append(img)
-                new_wheels.append(wheel)
+                    new_images.append(img)
+                    new_wheels.append(wheel)
 
-        new_images = np.array(new_images)
-        new_wheels = np.array(new_wheels)
+            new_images = np.array(new_images)
+            new_wheels = np.array(new_wheels)
 
-        print(len(new_images))
-        print(len(new_wheels))
-        print("type(new_images)", type(new_images))
-        print("type(new_wheels)", type(new_wheels))
-        print("type(new_images[0])", type(new_images[0]))
-        print("type(new_wheels)[0]", type(new_wheels[0]))
+            print(len(new_images))
+            print(len(new_wheels))
+            print("type(new_images)", type(new_images))
+            print("type(new_wheels)", type(new_wheels))
+            print("type(new_images[0])", type(new_images[0]))
+            print("type(new_wheels)[0]", type(new_wheels[0]))
 
-        yield new_images, new_wheels
+            yield (new_images, new_wheels)
 
 
 def train_model():
@@ -357,8 +359,12 @@ def train_model():
 
     model.compile(loss='mse', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
 
-    for X_train, Y_train in generate_train(files_train, file_wheel):
-        history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
+    #for X_train, Y_train in generate_train(files_train, file_wheel):
+    #    history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
+
+
+    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,3,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
+
 
     history2=model.evaluate(X_test, Y_test)
     print(history2)

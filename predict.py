@@ -18,7 +18,7 @@ import utils
 
 from keras.models import model_from_json
 
-data_dir = "/Users/lixinso/Desktop/udacity_sdc/term1/project_behavioralcloning/session_data/"
+data_dir = "../session_data/"
 
 with open("./model.json", "r") as jf:
     model_json = jf.read()
