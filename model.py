@@ -10,10 +10,15 @@ import os
 
 from keras.models import Sequential
 from keras.models import model_from_json
-from keras.layers import  Dense, Dropout, Activation, Flatten, Convolution2D, MaxPooling2D, Conv2D
+from keras.layers import  Dense, Dropout, Activation, Flatten, Convolution2D, MaxPooling2D, Conv2D,Lambda, ELU
+from keras.regularizers import l2
+from keras.layers.convolutional import Convolution2D
+
 from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras import backend as K
+
+import json
 
 import utils
 
@@ -106,12 +111,12 @@ def read_imgs(file_wheel_map):
 
     #new_images = new_images.reshape(-1, 32*32*3)
 
-    print(len(new_images))
-    print(len(new_wheels))
-    print("type(new_images)", type(new_images))
-    print("type(new_wheels)", type(new_wheels))
-    print("type(new_images[0])", type(new_images[0]))
-    print("type(new_wheels)[0]", type(new_wheels[0]))
+    #print(len(new_images))
+    #print(len(new_wheels))
+    #print("type(new_images)", type(new_images))
+    #print("type(new_wheels)", type(new_wheels))
+    #print("type(new_images[0])", type(new_images[0]))
+    #print("type(new_wheels)[0]", type(new_wheels[0]))
 
     new_images_train, new_images_test, new_wheels_train, new_wheels_test = train_test_split(np.array(new_images), new_wheels, test_size=0.20, random_state=42)
 
@@ -328,6 +333,9 @@ def train_model():
     #print(X_validation.shape)
 
     model = Sequential()
+
+    #original
+    '''
     model.add(Conv2D(24, 5,5, input_shape=(66,200,3), activation='relu'))
     model.add(MaxPooling2D((2, 2)))
     model.add((Dropout(0.5)))
@@ -359,22 +367,76 @@ def train_model():
 
     model.compile(loss='mse', optimizer=Adam(lr=0.0001), metrics=['accuracy'])
 
+    '''
+
+    #-----------------------
+
+    INIT = 'glorot_uniform'
+    keep_prob = 0.2
+    reg_val = 0.01
+    ch, row, col = 3, 66, 200  # camera format
+
+    model.add(Lambda(lambda x: x / 1.0 - 0.,
+                     input_shape=(row, col, ch),
+                     output_shape=(row, col, ch)))
+
+    model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode="valid", init=INIT, W_regularizer=l2(reg_val)))
+    # W_regularizer=l2(reg_val)
+    model.add(ELU())
+    model.add(Dropout(keep_prob))
+
+    model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode="valid", init=INIT))
+    model.add(ELU())
+    model.add(Dropout(keep_prob))
+
+    model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode="valid", init=INIT))
+    model.add(ELU())
+    model.add(Dropout(keep_prob))
+
+    model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode="valid", init=INIT))
+    model.add(ELU())
+    model.add(Dropout(keep_prob))
+
+    model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode="valid", init=INIT))
+    model.add(ELU())
+    model.add(Dropout(keep_prob))
+
+    model.add(Flatten())
+
+    model.add(Dense(100))
+    model.add(ELU())
+    model.add(Dropout(0.2))
+
+    model.add(Dense(50))
+    model.add(ELU())
+    model.add(Dropout(0.2))
+
+    model.add(Dense(10))
+    model.add(ELU())
+
+    model.add(Dense(1))
+
+    model.compile(optimizer="adam", loss="mse")  # , metrics=['accuracy']
+
+
+
+    #----------------------
+
     #for X_train, Y_train in generate_train(files_train, file_wheel):
     #    history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
 
 
-    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,3,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
-
-
-    history2=model.evaluate(X_test, Y_test)
-    print(history2)
+    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,1,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
 
     model_j = model.to_json()
     with open("./model.json","w") as jf:
-        jf.write(model_j)
+        json.dump(model_j,jf)
     #model.save("./model_save.model",True)
 
     model.save_weights("./model.h5",True)
+
+    history2=model.evaluate(X_test, Y_test)
+    print(history2)
 
 
 #Preproess

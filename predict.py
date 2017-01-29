@@ -14,6 +14,8 @@ from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras import backend as K
 
+import json
+
 import utils
 
 from keras.models import model_from_json
@@ -23,7 +25,8 @@ data_dir = "../session_data/"
 with open("./model.json", "r") as jf:
     model_json = jf.read()
 
-loaded_model = model_from_json(model_json)
+loaded_model = model_from_json(json.loads(model_json))
+loaded_model.compile("adam", "mse")
 loaded_model.load_weights("./model.h5")
 
 
