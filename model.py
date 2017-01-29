@@ -426,7 +426,7 @@ def train_model():
     #    history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
 
 
-    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,1,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
+    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,5,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
 
     model_j = model.to_json()
     with open("./model.json","w") as jf:
