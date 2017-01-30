@@ -6,10 +6,13 @@ import matplotlib.pyplot as plt
 import PIL
 from PIL import Image
 import numpy as np
+import cv2
 
 def preprocess(img):
     img = img.resize((200, 66))
     img1 = mpimg.pil_to_array(img)
+    img1 = cv2.cvtColor(img1,cv2.COLOR_RGB2HSV)
+
     #print(type(img1))
 
     img1 = img1.astype('float32')

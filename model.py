@@ -24,6 +24,7 @@ import utils
 
 np.random.seed(1337)
 
+'''
 #load data from multiple source
 data_dirs = ["../session_data/","../data/","../datame2/"]
 
@@ -63,7 +64,7 @@ def read_labels():
         nf.write(new_label_text)
 
     return file_wheel_map
-
+'''
 
 def read_imgs(file_wheel_map):
 
@@ -158,7 +159,7 @@ def load_train_vali_test():
     return X_train1, X_validation1, X_test1, y_train1, y_validation1, y_test1
 
 def split_train_test_validate_file_names():
-    file_wheel = read_labels()
+    file_wheel = utils.read_labels()
     files = list(file_wheel.keys())
     print(type(files))
     print(len(files))
@@ -249,7 +250,7 @@ def generate_train(files, file_wheel):
 def train_model():
     files_train, files_vali, files_test = split_train_test_validate_file_names()
 
-    file_wheel = read_labels()
+    file_wheel = utils.read_labels()
     X_validation, Y_validation = generate_train_test(files_vali,file_wheel)
     X_test, Y_test = generate_train_test(files_test, file_wheel)
 
@@ -368,9 +369,6 @@ def train_model():
 
     #----------------------
 
-    #for X_train, Y_train in generate_train(files_train, file_wheel):
-    #    history = model.fit(X_train, Y_train, batch_size=1280, nb_epoch=10, verbose=1, validation_data=(X_validation,Y_validation))
-
 
     history = model.fit_generator(generate_train(files_train,file_wheel),128*200,5,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
 
@@ -384,17 +382,7 @@ def train_model():
     history2=model.evaluate(X_test, Y_test)
     print(history2)
 
-
-#Preproess
-#file_wheel = read_labels()
-#read_imgs(file_wheel)
-
-#X_train, X_validation, y_train, y_validation = load_train_test()
 train_model()
-#val_acc: 1.0
-
-
-#split_train_test_validate_file_names()
 
 
 
