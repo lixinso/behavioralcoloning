@@ -34,42 +34,45 @@ def read_images(img_file_names):
 
 
 
-data_dir = "../session_data/"
+#load data from multiple source
+data_dirs = ["../session_data/","../data/","../datame2/"]
+
 def read_labels():
     file_wheel_map = {}
 
-    label_dir = data_dir + "driving_log.csv"
-
-    new_label_file = data_dir + "new_driving_log.csv"
+    new_label_file = "./new_driving_log.csv"
     new_label_text = ""
 
-    cnt = 0
-    with open(label_dir) as lf:
-        for line in lf:
+    for data_dir in data_dirs:
 
-            cnt += 1
+        label_dir = data_dir + "driving_log.csv"
 
-            if cnt  == 1:
-                continue
+        cnt = 0
+        with open(label_dir) as lf:
+            for line in lf:
 
-            columns = line.strip().split(",")
-            if len(columns) > 4:
-                center_file = columns[0].strip()#[4:]
-                left_file = columns[1].strip()#[4:]
-                right_file = columns[2].strip()#[4:]
-                #print(columns[3])
-                steering = float(columns[3].strip()) #int( round( float(columns[3].strip()) * 5.0 ) )
+                cnt += 1
 
-                print(center_file, steering)
-                new_label_text += center_file + "," + str(steering) + "\n"
+                if cnt  == 1:
+                    continue
 
-                file_wheel_map[center_file] = steering
+                columns = line.strip().split(",")
+                if len(columns) > 4:
+                    center_file = data_dir + columns[0].strip()#[4:]
+                    #left_file = columns[1].strip()#[4:]
+                    #right_file = columns[2].strip()#[4:]
+                    #print(columns[3])
+                    steering = float(columns[3].strip()) #int( round( float(columns[3].strip()) * 5.0 ) )
+
+                    print(center_file, steering)
+                    new_label_text += center_file + "," + str(steering) + "\n"
+
+                    file_wheel_map[center_file] = steering
 
     with open(new_label_file,"w") as nf:
         nf.write(new_label_text)
 
     return file_wheel_map
-
 
 
 

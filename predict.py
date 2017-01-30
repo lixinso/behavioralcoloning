@@ -20,7 +20,6 @@ import utils
 
 from keras.models import model_from_json
 
-data_dir = "../session_data/"
 
 with open("./model.json", "r") as jf:
     model_json = jf.read()
@@ -45,7 +44,7 @@ for file in file_wheel:
 
 
 
-    image_arr = utils.read_images([data_dir + file])
+    image_arr = utils.read_images([file])
     #print(image_arr.shape)
 
     predicted = loaded_model.predict(image_arr,1,1)
