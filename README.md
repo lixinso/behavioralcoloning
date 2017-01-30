@@ -18,7 +18,7 @@ RGB to YUV
 use fit_generator to generate data and save the memory
 
 The model rarchitecture refer to Nvidia's paper.
-![Nvidia Architecture](./source/nvdia_architecture.png)
+![Nvidia Architecture](./source/nvidia_architecture.png)
 
 ## Testing
 
