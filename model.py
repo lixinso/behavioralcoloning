@@ -24,13 +24,19 @@ import utils
 
 np.random.seed(1337)
 
+#Given a list of files(from different datasets), randomly select files for training, testing, validation purpose
 def split_train_test_validate_file_names():
+
+    #Read a all the images file names and corresponding wheel value into a dictionary. Keep only useful info.
     file_wheel = utils.read_labels()
     files = list(file_wheel.keys())
     print(type(files))
     print(len(files))
 
+
+    #Split 2000+ files for test and validation, rest of them use for training
     files_train, files_vali_test = train_test_split(files, test_size=0.07, random_state=42)
+    #from the 2000+ selected files, split half for test, half for validation
     files_vali, files_test = train_test_split(files_vali_test, test_size=0.5, random_state=42)
 
     print("train: ", len(files_train))
@@ -39,6 +45,9 @@ def split_train_test_validate_file_names():
 
     return files_train, files_vali, files_test
 
+
+#Generate data for test and validation.
+#Since they are fixed number of data. (Don't need yield)
 def generate_train_test(files, file_wheel):
 
     #img_dir = data_dir + "IMG/"
@@ -52,10 +61,14 @@ def generate_train_test(files, file_wheel):
     for file in files:
         file_path = file
 
+        #Make sure the image exists to avoid exception
         if os.path.exists(file_path)  and (file in file_wheel):
+
+            #Read images and preprocess it. See functions in the 'utils.py'
             img = utils.read_image(file_path)
             wheel = file_wheel[file]
 
+            #Build the list for X and Y
             new_images.append(img)
             new_wheels.append(wheel)
 
@@ -71,14 +84,18 @@ def generate_train_test(files, file_wheel):
 
     return new_images, new_wheels
 
-
+#Dynamicly generate train data. With yield.
+#It saves a lot of memory when loading the images.
 def generate_train(files, file_wheel):
 
+    #yield 128 per batch
     batch_size = 128
     total_cnt = len(files)
     batch_num = int(total_cnt / batch_size)
 
+    #Loop and serve as an unlimited data source
     while 1:
+        #Shuffle before yield
         np.random.shuffle(files)
         for b1 in range(0, batch_num):
 
@@ -88,6 +105,7 @@ def generate_train(files, file_wheel):
             new_wheels = []
 
             for b2 in range(0, batch_size):
+
                 idx = b1 * batch_size + b2
 
                 file = files[idx]
@@ -107,10 +125,16 @@ def generate_train(files, file_wheel):
 
 
 def train_model():
+
+    #Get train, validation, test file list
     files_train, files_vali, files_test = split_train_test_validate_file_names()
 
+    #Get file-wheel value dictionary
     file_wheel = utils.read_labels()
+
+    #Generate validation data
     X_validation, Y_validation = generate_train_test(files_vali,file_wheel)
+    #Generate test data
     X_test, Y_test = generate_train_test(files_test, file_wheel)
 
 
@@ -153,6 +177,7 @@ def train_model():
 
     #-----------------------
 
+    #The architecture of the model
     INIT = 'glorot_uniform'
     keep_prob = 0.2
     reg_val = 0.01
@@ -162,6 +187,7 @@ def train_model():
                      input_shape=(row, col, ch),
                      output_shape=(row, col, ch)))
 
+    #(3,66,200) => (24,5,5)
     model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode="valid", init=INIT, W_regularizer=l2(reg_val)))
     # W_regularizer=l2(reg_val)
     model.add(ELU())
@@ -198,22 +224,26 @@ def train_model():
 
     model.add(Dense(1))
 
+    #Compile model
     model.compile(optimizer="adam", loss="mse")  # , metrics=['accuracy']
 
 
 
     #----------------------
 
-
+    #Run the training
     history = model.fit_generator(generate_train(files_train,file_wheel),128*200,5,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
 
+    #Save the model
     model_j = model.to_json()
     with open("./model.json","w") as jf:
         json.dump(model_j,jf)
     #model.save("./model_save.model",True)
 
+    #Save the model weights
     model.save_weights("./model.h5",True)
 
+    #Evaluate the model with test data.
     history2=model.evaluate(X_test, Y_test)
     print(history2)
 

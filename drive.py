@@ -46,7 +46,10 @@ def telemetry(sid, data):
     #image = utils.preprocess(image) #new
     #image_array = np.asarray(image)
 
+    ################################################################
+    #Code added by Xinsong to preprocess the data to adapt the model
     image_array = utils.preprocess(image)
+    #################################################################
 
     print(image_array.shape)
     transformed_image_array = image_array[None, :, :, :]

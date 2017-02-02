@@ -27,6 +27,9 @@ Also, pick 1 image from every 1000 images to do the prediction and manully valid
 
 ## Improvements
 
+## References
+![End to End Learning for Self-Driving Cars](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf)
+![Learning a Driving Simulator](https://arxiv.org/pdf/1608.01230v1.pdf)
 
 ## TODOs
 Add rotation.

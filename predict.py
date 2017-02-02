@@ -20,29 +20,22 @@ import utils
 
 from keras.models import model_from_json
 
-
+#Open and load the saved model
 with open("./model.json", "r") as jf:
     model_json = jf.read()
-
 loaded_model = model_from_json(json.loads(model_json))
 loaded_model.compile("adam", "mse")
 loaded_model.load_weights("./model.h5")
 
-
-
+#Read all the training material file names and wheel
 file_wheel = utils.read_labels()
 
+#Then select 1 of 1000 and do the prediction
 ii = 0
 for file in file_wheel:
     ii+=1
     if ii % 1000 != 0:
         continue
-
-    #image_arr = utils.read_images([data_dir + "IMG/center_2017_01_21_00_16_39_587.jpg",
-    #                               data_dir + "IMG/center_2017_01_21_00_46_27_853.jpg",
-    #                               data_dir + "IMG/right_2017_01_21_00_32_49_032.jpg"])
-
-
 
     image_arr = utils.read_images([file])
     #print(image_arr.shape)

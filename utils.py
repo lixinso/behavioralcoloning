@@ -8,6 +8,7 @@ from PIL import Image
 import numpy as np
 import cv2
 
+#Preprocess the image. Resize and normalization
 def preprocess(img):
     img = img.resize((200, 66))
     img1 = mpimg.pil_to_array(img)
@@ -20,11 +21,13 @@ def preprocess(img):
 
     return img1
 
+#Read the image via Image library
 def read_image(img_file_name):
     img = Image.open(img_file_name)
     img1 = preprocess(img)
     return img1
 
+#Read a bunch of images
 def read_images(img_file_names):
     imgs = []
     for img_file_name in img_file_names:
@@ -70,6 +73,7 @@ def read_labels():
                     print(center_file, steering)
                     new_label_text += center_file + "," + str(steering) + "\n"
 
+                    #Create a dictionary to keep the file--wheel mapping
                     file_wheel_map[center_file] = steering
 
     with open(new_label_file,"w") as nf:
