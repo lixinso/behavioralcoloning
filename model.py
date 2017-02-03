@@ -230,7 +230,7 @@ def train_model():
     #Compile model
     model.compile(optimizer="adam", loss="mse")  # , metrics=['accuracy']
 
-    checkpoint = ModelCheckpoint('checkpoints/best_save' + '-{epoch:02d}-{val_loss:.4f}',
+    checkpoint = ModelCheckpoint('checkpoint/best_save' + '-{epoch:02d}-{val_loss:.4f}',
                                  monitor='val_loss', verbose=0, save_best_only=True,
                                  save_weights_only=False, mode='auto')
 

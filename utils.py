@@ -10,6 +10,10 @@ import cv2
 
 #Preprocess the image. Resize and normalization
 def preprocess(img):
+
+    #Remove the edge parts, which is not so important
+    img = img.crop((20, 140, 50, 270))
+    #Resize to adapt NVidia model
     img = img.resize((200, 66))
     img1 = mpimg.pil_to_array(img)
     #img1 = cv2.cvtColor(img1,cv2.COLOR_RGB2HSV)
