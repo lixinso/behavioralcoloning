@@ -22,6 +22,9 @@ import json
 
 import utils
 
+from keras.callbacks import ModelCheckpoint
+
+
 np.random.seed(1337)
 
 #Given a list of files(from different datasets), randomly select files for training, testing, validation purpose
@@ -227,12 +230,15 @@ def train_model():
     #Compile model
     model.compile(optimizer="adam", loss="mse")  # , metrics=['accuracy']
 
+    checkpoint = ModelCheckpoint('checkpoints/best_save' + '-{epoch:02d}-{val_loss:.4f}',
+                                 monitor='val_loss', verbose=0, save_best_only=True,
+                                 save_weights_only=False, mode='auto')
 
 
     #----------------------
 
     #Run the training
-    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,5,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000)
+    history = model.fit_generator(generate_train(files_train,file_wheel),128*200,5,verbose=1,validation_data=(X_validation,Y_validation),nb_val_samples=1000, callbacks=[checkpoint])
 
     #Save the model
     model_j = model.to_json()
