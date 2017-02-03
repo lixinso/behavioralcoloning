@@ -51,7 +51,7 @@ def split_train_test_validate_file_names():
 
 #Generate data for test and validation.
 #Since they are fixed number of data. (Don't need yield)
-def generate_train_test(files, file_wheel):
+def generate_validation_test(files, file_wheel):
 
     #img_dir = data_dir + "IMG/"
     #img_prefix_center = "center"
@@ -136,9 +136,9 @@ def train_model():
     file_wheel = utils.read_labels()
 
     #Generate validation data
-    X_validation, Y_validation = generate_train_test(files_vali,file_wheel)
+    X_validation, Y_validation = generate_validation_test(files_vali,file_wheel)
     #Generate test data
-    X_test, Y_test = generate_train_test(files_test, file_wheel)
+    X_test, Y_test = generate_validation_test(files_test, file_wheel)
 
 
     model = Sequential()
