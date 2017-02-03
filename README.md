@@ -43,7 +43,7 @@ In the first layers, we use 0.2 as dropout to remove overfitting issues, also us
 
 Adam optimizer was used to optimize the model.
 
-The training epochs use 5, each epoch has 25600 inputs samples by generator
+The training epochs use 5, each epoch has 25600 inputs samples by generator. The loss not change too much after epoch 3, so choose a safer number 5.
 
 ![Nvidia Architecture](./source/nvidia_architecture.png)
 
