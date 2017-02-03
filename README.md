@@ -53,7 +53,12 @@ Testing use 10% of the data to do the testing.
 Also, pick 1 image from every 1000 images to do the prediction and manully validate the results.
 
 ## Simulate the result in autonomous mode
-Change the
+Modify the driver.py, add the preprocess function before send the data to the model.
+Run driver.py with saved model.
+Change the Emulator in AUTONOMOUS MODE and run.
+The Emulator will run in autonomous mode, change the wheels according to different conditions.
+![AUTONOMOUS RESULT](./source/autonomous_01.png)
+
 
 ## Improvements
 
