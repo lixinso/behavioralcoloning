@@ -87,6 +87,45 @@ def generate_validation_test(files, file_wheel):
 
     return new_images, new_wheels
 
+
+def generate_validation_test_dynamic(files, file_wheel):
+
+    #img_dir = data_dir + "IMG/"
+    #img_prefix_center = "center"
+    #img_prefix_left = "left"
+    #img_prefix_right = "right"
+
+    new_images = []
+    new_wheels = []
+
+    for file in files:
+        file_path = file
+
+        #Make sure the image exists to avoid exception
+        if os.path.exists(file_path)  and (file in file_wheel):
+
+            #Read images and preprocess it. See functions in the 'utils.py'
+            img = utils.read_image(file_path)
+            wheel = file_wheel[file]
+
+            #Build the list for X and Y
+            new_images.append(img)
+            new_wheels.append(wheel)
+
+    new_images = np.array(new_images)
+    new_wheels = np.array(new_wheels)
+
+    print(len(new_images))
+    print(len(new_wheels))
+    print("type(new_images)", type(new_images))
+    print("type(new_wheels)", type(new_wheels))
+    print("type(new_images[0])", type(new_images[0]))
+    print("type(new_wheels)[0]", type(new_wheels[0]))
+
+    return new_images, new_wheels
+
+
+
 #Dynamicly generate train data. With yield.
 #It saves a lot of memory when loading the images.
 def generate_train(files, file_wheel):
@@ -226,6 +265,8 @@ def train_model():
     model.add(ELU())
 
     model.add(Dense(1))
+
+    model.summary()
 
     #Compile model
     model.compile(optimizer="adam", loss="mse")  # , metrics=['accuracy']
